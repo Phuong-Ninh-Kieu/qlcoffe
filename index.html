@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CafeManager Pro</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <!-- Font Awesome & Google Font -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #f4f1eb;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 12px;
+      padding-bottom: 40px;
+    }
+
+    .app {
+      max-width: 480px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 12px 40px rgba(45, 31, 18, 0.06);
+      padding: 20px 16px;
+      transition: all 0.25s ease;
+    }
+
+    /* ========== AUTH SPLASH ========== */
+    .auth-splash {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0 10px 0;
+    }
+
+    .auth-splash .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .auth-splash .brand i {
+      font-size: 32px;
+      color: #b47c5e;
+      background: #f4ede7;
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .auth-splash .brand h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #2d1f12;
+      letter-spacing: -0.5px;
+    }
+
+    .auth-splash .brand h1 span {
+      color: #b47c5e;
+    }
+
+    .auth-splash .sub {
+      color: #7f6e5d;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    .auth-card {
+      width: 100%;
+      background: #faf8f6;
+      border-radius: 20px;
+      padding: 20px 16px;
+      border: 1px solid #eee8e0;
+    }
+
+    .auth-card .toggle-group {
+      display: flex;
+      background: #ede8e2;
+      border-radius: 60px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .auth-card .toggle-group button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 12px 0;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #5a4a3a;
+      cursor: pointer;
+      transition: 0.2s;
+      touch-action: manipulation;
+    }
+
+    .auth-card .toggle-group button.active {
+      background: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      color: #2d1f12;
+    }
+
+    .auth-card .form-group {
+      margin-bottom: 16px;
+    }
+
+    .auth-card .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #3e2e1f;
+      margin-bottom: 6px;
+    }
+
+    .auth-card .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid #e0d8d0;
+      border-radius: 14px;
+      font-size: 15px;
+      background: #ffffff;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .auth-card .form-group input:focus {
+      border-color: #b47c5e;
+      box-shadow: 0 0 0 4px rgba(180, 124, 94, 0.12);
+    }
+
+    .auth-card .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: #2d1f12;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.15s;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 4px;
+      min-height: 48px;
+    }
+
+    .auth-card .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .auth-card .btn-primary:disabled {
+      opacity: 0.6;
+    }
+
+    .auth-card .auth-error {
+      color: #c0392b;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .auth-card .auth-success {
+      color: #2e7d5e;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .auth-card .demo-hint {
+      text-align: center;
+      font-size: 12px;
+      color: #9a8a7a;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #ede8e2;
+    }
+
+    .auth-card .demo-hint code {
+      background: #ede8e2;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #2d1f12;
+    }
+
+    /* ========== MAIN APP HEADER ========== */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #f0ebe5;
+      margin-bottom: 16px;
+    }
+
+    .app-header .brand-small {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-header .brand-small i {
+      font-size: 20px;
+      color: #b47c5e;
+    }
+
+    .app-header .brand-small h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2d1f12;
+    }
+
+    .app-header .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-header .user-menu .user-info {
+      text-align: right;
+      line-height: 1.3;
+    }
+
+    .app-header .user-menu .user-info .name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #2d1f12;
+    }
+
+    .app-header .user-menu .user-info .email {
+      font-size: 11px;
+      color: #7f6e5d;
+      max-width: 110px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .app-header .btn-logout {
+      background: none;
+      border: none;
+      color: #7f6e5d;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 12px;
+      transition: 0.15s;
+      touch-action: manipulation;
+    }
+
+    .app-header .btn-logout:active {
+      background: #f0ebe5;
+      transform: scale(0.92);
+    }
+
+    /* ========== TABS ========== */
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: #f2ede7;
+      padding: 4px;
+      border-radius: 60px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      padding: 10px 4px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      background: transparent;
+      color: #5a4a3a;
+      border: none;
+      font-size: 12px;
+      text-align: center;
+      touch-action: manipulation;
+      min-height: 44px;
+      display: flex;
+      vertical-align: middle;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .tab i {
+      font-size: 14px;
+    }
+
+    .tab.active {
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      color: #2d1f12;
+    }
+
+    .tab-content {
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ========== DASHBOARD ========== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: #faf8f6;
+      padding: 14px 12px;
+      border-radius: 16px;
+      border: 1px solid #f0ebe5;
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: #7f6e5d;
+      font-weight: 500;
+    }
+
+    .stat-card .value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d1f12;
+      margin-top: 4px;
+      word-break: break-word;
+    }
+
+    .stat-card .value .currency {
+      font-size: 13px;
+      font-weight: 500;
+      color: #7f6e5d;
+      margin-left: 1px;
+    }
+
+    .quick-tip {
+      background: #faf8f6;
+      border-radius: 16px;
+      padding: 12px 14px;
+      border: 1px solid #f0ebe5;
+      text-align: center;
+      font-size: 13px;
+      color: #5a4a3a;
+    }
+
+    .quick-tip strong {
+      color: #2d1f12;
+    }
+
+    /* ========== TABLES GRID ========== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4px 0 12px 0;
+    }
+
+    .section-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d1f12;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-header h3 i {
+      color: #b47c5e;
+    }
+
+    .btn-icon {
+      background: #2d1f12;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.15s;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+    }
+
+    .btn-icon:active {
+      transform: scale(0.96);
+    }
+
+    .btn-icon-success { background: #2e7d5e; }
+    .btn-icon-danger { background: #c0392b; }
+    .btn-icon-warning { background: #d68910; }
+    .btn-icon-sm {
+      padding: 8px 14px;
+      font-size: 12px;
+      min-height: 38px;
+    }
+
+    /* ========== FIXED SCROLLABLE LAYOUT ========== */
+    .tables-section {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      padding: 4px 2px;
+    }
+
+    .table-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .table-card {
+      background: #faf8f6;
+      border: 1.5px solid #eee8e0;
+      border-radius: 16px;
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.15s;
+      touch-action: manipulation;
+      min-height: 85px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .table-card:active {
+      background: #efe9e0;
+    }
+
+    .table-card .table-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: #2d1f12;
+    }
+
+    .table-card .status {
+      font-size: 11px;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .table-card .status.occupied { color: #b47c5e; font-weight: 600; }
+    .table-card .status.empty { color: #7f6e5d; }
+
+    .table-card .bill-btn {
+      margin-top: 6px;
+      background: #2e7d5e;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      min-height: 28px;
+    }
+
+    .table-card .merge-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: #d68910;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* ========== MENU MANAGEMENT - FIXED HEIGHT ========== */
+    .menu-section {
+      background: #faf8f6;
+      border-radius: 18px;
+      padding: 14px;
+      margin: 4px 0 16px 0;
+      border: 1px solid #f0ebe5;
+    }
+
+    .add-item-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .add-item-row input {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1.5px solid #e0d8d0;
+      font-size: 14px;
+      outline: none;
+    }
+    #newItemName { flex: 2; min-width: 100px; }
+    #newItemPrice { flex: 1; min-width: 60px; }
+
+    /* Menu items với chiều cao cố định và cuộn */
+    .menu-items-container {
+      max-height: 180px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .menu-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .menu-item {
+      background: white;
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid #e2dad2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      cursor: grab;
+      transition: transform 0.1s, box-shadow 0.1s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .menu-item:active {
+      cursor: grabbing;
+    }
+
+    .menu-item.dragging {
+      opacity: 0.5;
+      transform: scale(0.95);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .menu-item.drag-over {
+      border-color: #b47c5e;
+      background: #f4ede7;
+      border-width: 2px;
+    }
+
+    .menu-item .drag-icon {
+      color: #ccc;
+      font-size: 16px;
+      margin-right: 4px;
+      cursor: grab;
+    }
+
+    .menu-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .menu-item-info .name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #2d1f12;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .menu-item-info .price {
+      font-weight: 700;
+      font-size: 13px;
+      color: #b47c5e;
+      margin-top: 1px;
+    }
+
+    .menu-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-serve {
+      background: #ede8e2;
+      color: #2d1f12;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-serve:active { background: #dfd8cf; }
+
+    .btn-action-trigger {
+      background: transparent;
+      color: #7f6e5d;
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 10px;
+      min-height: 38px;
+      min-width: 38px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-action-trigger:active { background: #f2ede7; }
+    .btn-action-edit { color: #d68910; }
+    .btn-action-del { color: #c0392b; }
+
+    /* ========== ORDER DETAIL ========== */
+    .order-panel {
+      margin-top: 16px;
+      border-top: 2px dashed #e6e0d8;
+      padding-top: 14px;
+    }
+
+    .order-panel .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .order-panel .panel-header h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d1f12;
+    }
+
+    .order-summary {
+      background: #faf8f6;
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid #eee8e0;
+      margin: 4px 0;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0ebe5;
+      font-size: 13px;
+    }
+    .order-item:last-child { border-bottom: none; }
+
+    .order-item .item-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .order-item .item-controls button {
+      background: #ede8e2;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .order-item .item-controls button:active { background: #dfd8cf; }
+    .order-item .item-controls .qty {
+      min-width: 20px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .order-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 2px 6px 2px;
+    }
+
+    .order-total-row .total-label {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .order-total-row .total-value {
+      font-weight: 800;
+      font-size: 18px;
+      color: #2d1f12;
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .order-actions .btn-icon {
+      flex: 1;
+      justify-content: center;
+      min-height: 46px;
+    }
+
+    /* ========== REPORT ========== */
+    .report-controls {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .report-controls input {
+      flex: 1.3;
+      padding: 10px;
+      border-radius: 40px;
+      border: 1.5px solid #e0d8d0;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .report-controls .btn-icon {
+      flex: 1;
+      padding: 6px 4px;
+      font-size: 12px;
+      justify-content: center;
+      min-height: 38px;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .report-card {
+      background: #faf8f6;
+      border-radius: 14px;
+      padding: 12px 4px;
+      text-align: center;
+      border: 1px solid #f0ebe5;
+    }
+
+    .report-card .label {
+      font-size: 11px;
+      color: #7f6e5d;
+      font-weight: 500;
+    }
+
+    .report-card .value {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2d1f12;
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    #reportDetailList {
+      background: #faf8f6;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 12px;
+      border: 1px solid #f0ebe5;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    #reportDetailList div {
+      border-bottom: 1px solid #f0ebe5;
+      padding: 8px 0;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ========== TOAST MESSAGE ========== */
+    .toast-message {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2d1f12;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 60px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 999;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      max-width: 85%;
+      text-align: center;
+      animation: slideUp 0.2s ease;
+    }
+    .toast-error { background: #c0392b; }
+    .toast-success { background: #2e7d5e; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(15px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .rule-box {
+      background: #1e2a3a;
+      color: #e4e9f0;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 11px;
+      font-family: monospace;
+    }
+    .rule-box .comment { color: #6a9955; }
+    .rule-box .key { color: #9cdcfe; }
+    .rule-box .string { color: #ce9178; }
+
+    /* ========== DROP ZONE ========== */
+    .drop-zone {
+      border: 2px dashed #ccc;
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+      color: #999;
+      font-size: 13px;
+      margin: 4px 0 8px 0;
+      transition: all 0.2s;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drop-zone.active {
+      border-color: #b47c5e;
+      background: #f4ede7;
+      color: #2d1f12;
+    }
+
+    /* ========== RESPONSIVE MOBILE SIZES ========== */
+    @media (max-width: 420px) {
+      .app { padding: 14px 12px; border-radius: 20px; }
+      .table-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .stat-card .value { font-size: 17px; }
+      .tab { font-size: 11px; }
+      .tables-section { max-height: 160px; }
+    }
+    @media (min-width: 600px) {
+      .app { max-width: 480px; }
+    }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: #d5ccc2; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ========== AUTH SPLASH ========== -->
+    <div id="authSplash" class="auth-splash">
+      <div class="brand">
+        <i class="fas fa-mug-saucer"></i>
+        <h1>Cafe<span>Manager</span></h1>
+      </div>
+      <p class="sub">Quản lý quán cafe thông minh</p>
+
+      <div class="auth-card">
+        <div class="toggle-group">
+          <button id="authLoginTab" class="active">Đăng nhập</button>
+          <button id="authRegisterTab">Đăng ký</button>
+        </div>
+
+        <div id="loginForm">
+          <div class="form-group">
+            <label><i class="far fa-envelope" style="margin-right:6px;"></i>Email</label>
+            <input type="email" id="loginEmail" placeholder="your@email.com" value="demo@cafe.com">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-lock" style="margin-right:6px;"></i>Mật khẩu</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" value="123456">
+          </div>
+          <button class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
+          <div id="loginError" class="auth-error"></div>
+        </div>
+
+        <div id="registerForm" class="hidden">
+          <div class="form-group">
+            <label><i class="far fa-envelope" style="margin-right:6px;"></i>Email</label>
+            <input type="email" id="registerEmail" placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-lock" style="margin-right:6px;"></i>Mật khẩu (6+ ký tự)</label>
+            <input type="password" id="registerPassword" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-check-circle" style="margin-right:6px;"></i>Xác nhận</label>
+            <input type="password" id="registerConfirm" placeholder="Nhập lại mật khẩu">
+          </div>
+          <button class="btn-primary" id="registerBtn"><i class="fas fa-user-plus"></i> Tạo tài khoản</button>
+          <div id="registerError" class="auth-error"></div>
+          <div id="registerSuccess" class="auth-success"></div>
+        </div>
+
+       <!-- <div class="demo-hint">
+          🧪 Dùng thử: <code>demo@cafe.com</code> / <code>123456</code>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- ========== MAIN APP ========== -->
+    <div id="mainApp" class="hidden">
+
+      <!-- Header -->
+      <div class="app-header">
+        <div class="brand-small">
+          <i class="fas fa-mug-saucer"></i>
+          <h2>Cafe 1A</h2>
+        </div>
+        <div class="user-menu">
+          <div class="user-info">
+            <div class="name" id="userDisplayName">User</div>
+            <div class="email" id="userDisplayEmail">user@email.com</div>
+          </div>
+          <button class="btn-logout" id="logoutBtn" title="Đăng xuất">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs" id="tabContainer">
+        <button class="tab active" data-tab="dashboard"><i class="fas fa-chart-simple"></i> <span>Tổng quan</span></button>
+        <button class="tab" data-tab="tables"><i class="fas fa-table"></i> <span>Bàn & món</span></button>
+        <button class="tab" data-tab="report"><i class="fas fa-calendar"></i> <span>Tổng hợp</span></button>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div id="tabDashboard" class="tab-content">
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <div class="label">📋 Tổng bàn</div>
+            <div class="value" id="totalTables">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">🟡 Đang phục vụ</div>
+            <div class="value" id="occupiedTables">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">💰 Doanh thu hôm nay</div>
+            <div class="value" id="todayRevenue">0<span class="currency">đ</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">📦 Món đã bán</div>
+            <div class="value" id="totalItemsSold">0</div>
+          </div>
+        </div>
+        <div class="quick-tip">
+          <i class="fas fa-circle-info" style="color:#b47c5e;margin-right:6px;"></i>
+          Chọn <strong>“Bàn & món”</strong> để bắt đầu phục vụ
+        </div>
+      </div>
+
+      <!-- TABLES & MENU -->
+      <div id="tabTables" class="tab-content hidden">
+        <div class="section-header">
+          <h3><i class="fas fa-chair"></i> Bàn</h3>
+          <div style="display:flex;gap:4px;">
+            <button class="btn-icon btn-icon-sm" id="mergeTablesBtn"><i class="fas fa-merge"></i> Ghép</button>
+            <button class="btn-icon btn-icon-sm" id="addTableBtn"><i class="fas fa-plus"></i> Thêm</button>
+          </div>
+        </div>
+
+        <!-- Bàn với chiều cao cố định và cuộn -->
+        <div class="tables-section" id="tablesSection">
+          <div class="table-grid" id="tableGrid"></div>
+        </div>
+
+        <!-- Drop Zone để kéo thả món vào bàn -->
+        <div class="drop-zone" id="dropZone">
+          <i class="fas fa-arrow-down" style="margin-right:8px;"></i>
+          Kéo món từ menu thả vào đây để gọi món cho bàn đã chọn
+        </div>
+
+        <div class="section-header" style="margin-top:4px;">
+          <h3><i class="fas fa-mug-hot"></i> Menu thực đơn</h3>
+        </div>
+
+        <!-- Menu với chiều cao cố định và cuộn -->
+        <div class="menu-section">
+          <div class="add-item-row">
+            <input type="text" id="newItemName" placeholder="Tên món">
+            <input type="number" id="newItemPrice" placeholder="Giá" inputmode="numeric">
+            <button class="btn-icon btn-icon-success btn-icon-sm" id="addItemBtn"><i class="fas fa-plus"></i> Thêm</button>
+          </div>
+          <div class="menu-items-container" id="menuContainer">
+            <div class="menu-items" id="menuItemsList"></div>
+          </div>
+        </div>
+
+        <!-- Order detail panel -->
+        <div id="tableDetail" class="order-panel hidden">
+          <div class="panel-header">
+            <h4 id="detailTableName">Bàn 1</h4>
+            <div style="display:flex;gap:4px;">
+              <button class="btn-icon btn-icon-danger btn-icon-sm" id="clearTableBtn"><i class="fas fa-undo"></i> Trả bàn</button>
+            </div>
+          </div>
+          <div class="order-summary" id="orderDetail">
+            <p style="color:#7f6e5d;text-align:center;padding:8px 0;">Chọn bàn để xem chi tiết</p>
+          </div>
+          <div class="order-total-row">
+            <span class="total-label">Tổng cộng</span>
+            <span class="total-value" id="detailTotal">0<span style="font-size:13px;font-weight:600;color:#7f6e5d;margin-left:2px;">đ</span></span>
+          </div>
+          <div class="order-actions">
+            <button class="btn-icon btn-icon-success" id="checkoutBtn"><i class="fas fa-check"></i> Thanh toán</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORT -->
+      <div id="tabReport" class="tab-content hidden">
+        <div class="section-header" style="margin-top:0;">
+          <h3><i class="fas fa-chart-pie"></i> Tổng hợp</h3>
+        </div>
+        <div class="report-controls">
+          <input type="date" id="reportDate" value="2026-07-06">
+          <button class="btn-icon btn-icon-sm" id="reportDayBtn">Ngày</button>
+          <button class="btn-icon btn-icon-sm" id="reportMonthBtn">Tháng</button>
+          <button class="btn-icon btn-icon-sm" id="reportYearBtn">Năm</button>
+        </div>
+        <div class="report-grid">
+          <div class="report-card">
+            <div class="label">Doanh thu</div>
+            <div class="value" id="reportRevenue">0<span style="font-size:11px;font-weight:500;color:#7f6e5d;margin-left:2px;">đ</span></div>
+          </div>
+          <div class="report-card">
+            <div class="label">Số đơn</div>
+            <div class="value" id="reportOrders">0</div>
+          </div>
+          <div class="report-card">
+            <div class="label">Món bán</div>
+            <div class="value" id="reportItems">0</div>
+          </div>
+        </div>
+        <div id="reportDetailList">
+          <p style="color:#7f6e5d;text-align:center;padding:8px 0;">Chọn khoảng thời gian để xem chi tiết</p>
+        </div>
+      </div>
+
+    </div><!-- end mainApp -->
+  </div><!-- end app -->
+
+  <script>
+    // ============================================================
+    // FIREBASE CONFIG
+    // ============================================================
+    const firebaseConfig = {
+  apiKey: "AIzaSyDul0MkkTSn15F-g48DUxr1YJk8xew51p0",
+  authDomain: "qlcoffee-97289.firebaseapp.com",
+  databaseURL: "https://qlcoffee-97289-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "qlcoffee-97289",
+  storageBucket: "qlcoffee-97289.firebasestorage.app",
+  messagingSenderId: "679380881408",
+  appId: "1:679380881408:web:f23223b4108bd2c17d88e5"
+};
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // ============================================================
+    // DOM REFS
+    // ============================================================
+    const $ = id => document.getElementById(id);
+
+    const authSplash = $('authSplash');
+    const mainApp = $('mainApp');
+
+    const authLoginTab = $('authLoginTab');
+    const authRegisterTab = $('authRegisterTab');
+    const loginForm = $('loginForm');
+    const registerForm = $('registerForm');
+
+    const loginEmail = $('loginEmail');
+    const loginPassword = $('loginPassword');
+    const loginBtn = $('loginBtn');
+    const loginError = $('loginError');
+
+    const registerEmail = $('registerEmail');
+    const registerPassword = $('registerPassword');
+    const registerConfirm = $('registerConfirm');
+    const registerBtn = $('registerBtn');
+    const registerError = $('registerError');
+    const registerSuccess = $('registerSuccess');
+
+    const logoutBtn = $('logoutBtn');
+    const userDisplayName = $('userDisplayName');
+    const userDisplayEmail = $('userDisplayEmail');
+
+    const tabDashboard = $('tabDashboard');
+    const tabTables = $('tabTables');
+    const tabReport = $('tabReport');
+
+    const totalTables = $('totalTables');
+    const occupiedTables = $('occupiedTables');
+    const todayRevenue = $('todayRevenue');
+    const totalItemsSold = $('totalItemsSold');
+
+    const tableGrid = $('tableGrid');
+    const menuItemsList = $('menuItemsList');
+    const addTableBtn = $('addTableBtn');
+    const mergeTablesBtn = $('mergeTablesBtn');
+    const addItemBtn = $('addItemBtn');
+    const newItemName = $('newItemName');
+    const newItemPrice = $('newItemPrice');
+    const dropZone = $('dropZone');
+
+    const tableDetail = $('tableDetail');
+    const detailTableName = $('detailTableName');
+    const orderDetail = $('orderDetail');
+    const detailTotal = $('detailTotal');
+    const clearTableBtn = $('clearTableBtn');
+    const checkoutBtn = $('checkoutBtn');
+
+    const reportDate = $('reportDate');
+    const reportDayBtn = $('reportDayBtn');
+    const reportMonthBtn = $('reportMonthBtn');
+    const reportYearBtn = $('reportYearBtn');
+    const reportRevenue = $('reportRevenue');
+    const reportOrders = $('reportOrders');
+    const reportItems = $('reportItems');
+    const reportDetailList = $('reportDetailList');
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let currentUser = null;
+    let tablesRef = null, menuRef = null, ordersRef = null;
+    let currentTableId = null;
+    let allTables = {}, menuItems = {};
+    let orderListeners = {};
+    let mergeMode = false;
+    let selectedMergeTables = [];
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(msg, type = 'info', duration = 2500) {
+      const old = document.querySelector('.toast-message');
+      if (old) old.remove();
+      const div = document.createElement('div');
+      div.className = `toast-message ${type === 'error' ? 'toast-error' : type === 'success' ? 'toast-success' : ''}`;
+      div.textContent = msg;
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), duration);
+    }
+
+    // ============================================================
+    // LOADING BUTTON
+    // ============================================================
+    function setLoading(btn, loading) {
+      if (loading) {
+        btn.dataset.originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner"></span> Đang xử lý...';
+        btn.disabled = true;
+      } else {
+        btn.innerHTML = btn.dataset.originalText || btn.innerHTML;
+        btn.disabled = false;
+      }
+    }
+
+    // ============================================================
+    // AUTH UI SWITCH
+    // ============================================================
+    authLoginTab.addEventListener('click', function() {
+      this.classList.add('active');
+      authRegisterTab.classList.remove('active');
+      loginForm.classList.remove('hidden');
+      registerForm.classList.add('hidden');
+      loginError.textContent = '';
+      registerError.textContent = '';
+      registerSuccess.textContent = '';
+    });
+
+    authRegisterTab.addEventListener('click', function() {
+      this.classList.add('active');
+      authLoginTab.classList.remove('active');
+      registerForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+      loginError.textContent = '';
+      registerError.textContent = '';
+      registerSuccess.textContent = '';
+    });
+
+    // ============================================================
+    // LOGIN
+    // ============================================================
+    loginBtn.addEventListener('click', async () => {
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
+
+      if (!email || !password) {
+        loginError.textContent = '⚠️ Vui lòng nhập email và mật khẩu';
+        return;
+      }
+      setLoading(loginBtn, true);
+      loginError.textContent = '';
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showToast('✅ Đăng nhập thành công!', 'success');
+      } catch (error) {
+        let msg = 'Đăng nhập thất bại. ';
+        if (error.code === 'auth/user-not-found') msg += 'Sai email.';
+        else if (error.code === 'auth/wrong-password') msg += 'Sai mật khẩu.';
+        else msg += error.message;
+        loginError.textContent = '❌ ' + msg;
+      } finally {
+        setLoading(loginBtn, false);
+      }
+    });
+
+    // ============================================================
+    // REGISTER
+    // ============================================================
+    registerBtn.addEventListener('click', async () => {
+      const email = registerEmail.value.trim();
+      const password = registerPassword.value;
+      const confirm = registerConfirm.value;
+
+      registerError.textContent = '';
+      registerSuccess.textContent = '';
+
+      if (!email || !password || !confirm) {
+        registerError.textContent = '⚠️ Vui lòng điền đầy đủ thông tin';
+        return;
+      }
+      if (password !== confirm) {
+        registerError.textContent = '⚠️ Mật khẩu xác nhận không khớp';
+        return;
+      }
+
+      setLoading(registerBtn, true);
+
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        registerSuccess.textContent = '✅ Đăng ký thành công! Đang chuyển...';
+        showToast('✅ Tạo tài khoản thành công!', 'success');
+      } catch (error) {
+        registerError.textContent = '❌ ' + error.message;
+      } finally {
+        setLoading(registerBtn, false);
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut();
+      showToast('👋 Đã đăng xuất', 'info');
+    });
+
+    // ============================================================
+    // AUTH STATE CHANGE
+    // ============================================================
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        authSplash.classList.add('hidden');
+        mainApp.classList.remove('hidden');
+
+        userDisplayName.textContent = user.displayName || user.email?.split('@')[0] || 'User';
+        userDisplayEmail.textContent = user.email || '';
+
+        tablesRef = db.ref(`${user.uid}/tables`);
+        menuRef = db.ref(`${user.uid}/menu`);
+        ordersRef = db.ref(`${user.uid}/orders`);
+
+        allTables = {};
+        menuItems = {};
+        Object.values(orderListeners).forEach(fn => { if (fn) fn(); });
+        orderListeners = {};
+
+        loadData();
+      } else {
+        currentUser = null;
+        authSplash.classList.remove('hidden');
+        mainApp.classList.add('hidden');
+        clearDetail();
+      }
+    });
+
+    function loadData() {
+      if (!tablesRef) return;
+      tablesRef.on('value', snap => {
+        allTables = snap.val() || {};
+        renderTables();
+        updateDashboard();
+        if (currentTableId && !allTables[currentTableId]) clearDetail();
+        updateDropZone();
+      });
+
+      menuRef.on('value', snap => {
+        menuItems = snap.val() || {};
+        renderMenu();
+      });
+
+      ordersRef.on('value', () => { updateDashboard(); });
+    }
+
+    // ============================================================
+    // RENDER TABLES
+    // ============================================================
+    function renderTables() {
+      let html = '';
+      const ids = Object.keys(allTables);
+      if (ids.length === 0) {
+        html = '<div style="color:#7f6e5d;padding:16px;text-align:center;grid-column:1/-1;font-size:13px;">Chưa có bàn nào, hãy tạo bàn mới.</div>';
+      } else {
+        ids.forEach(id => {
+          const t = allTables[id];
+          const isOccupied = (t.status === 'occupied');
+          const isSelected = mergeMode && selectedMergeTables.includes(id);
+          html += `<div class="table-card" data-id="${id}" style="${isSelected ? 'border-color:#d68910;border-width:2px;' : ''}">
+              <div class="table-name">${t.name || 'Bàn'}</div>
+              <div class="status ${isOccupied ? 'occupied' : 'empty'}">${isOccupied ? '🟡 Phục vụ' : '⚪ Trống'}</div>
+              ${isOccupied ? `<button class="bill-btn" data-id="${id}">🧾 Chi tiết</button>` : ''}
+              ${mergeMode ? `<button class="merge-btn" data-id="${id}">${isSelected ? '✓' : '+'}</button>` : ''}
+            </div>`;
+        });
+      }
+      tableGrid.innerHTML = html;
+
+      document.querySelectorAll('.table-card').forEach(el => {
+        const id = el.dataset.id;
+        el.addEventListener('click', () => {
+          if (mergeMode) {
+            toggleMergeSelection(id);
+          } else {
+            selectTable(id);
+          }
+        });
+        const btn = el.querySelector('.bill-btn');
+        if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); selectTable(id); });
+        const mergeBtn = el.querySelector('.merge-btn');
+        if (mergeBtn) mergeBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMergeSelection(id); });
+      });
+    }
+
+    // ============================================================
+    // CHỨC NĂNG GHÉP BÀN
+    // ============================================================
+    mergeTablesBtn.addEventListener('click', () => {
+      mergeMode = !mergeMode;
+      selectedMergeTables = [];
+      if (mergeMode) {
+        mergeTablesBtn.innerHTML = '<i class="fas fa-times"></i> Hủy';
+        mergeTablesBtn.style.background = '#c0392b';
+        showToast('🔀 Chọn các bàn muốn ghép (tối đa 2 bàn)', 'info');
+      } else {
+        mergeTablesBtn.innerHTML = '<i class="fas fa-merge"></i> Ghép';
+        mergeTablesBtn.style.background = '#2d1f12';
+        renderTables();
+      }
+    });
+
+    function toggleMergeSelection(tableId) {
+      const table = allTables[tableId];
+      if (!table || table.status !== 'occupied') {
+        showToast('⚠️ Chỉ có thể ghép các bàn đang phục vụ!', 'error');
+        return;
+      }
+      
+      const index = selectedMergeTables.indexOf(tableId);
+      if (index > -1) {
+        selectedMergeTables.splice(index, 1);
+      } else {
+        if (selectedMergeTables.length >= 2) {
+          showToast('⚠️ Chỉ có thể ghép tối đa 2 bàn!', 'error');
+          return;
+        }
+        selectedMergeTables.push(tableId);
+      }
+      
+      if (selectedMergeTables.length === 2) {
+        performMerge();
+      } else {
+        renderTables();
+      }
+    }
+
+    function performMerge() {
+      if (selectedMergeTables.length !== 2) return;
+      
+      const [table1Id, table2Id] = selectedMergeTables;
+      const table1 = allTables[table1Id];
+      const table2 = allTables[table2Id];
+      
+      if (!table1 || !table2 || table1.status !== 'occupied' || table2.status !== 'occupied') {
+        showToast('⚠️ Các bàn đã chọn không hợp lệ!', 'error');
+        selectedMergeTables = [];
+        renderTables();
+        return;
+      }
+
+      if (!confirm(`Ghép bàn "${table1.name}" và "${table2.name}" thành một?`)) {
+        selectedMergeTables = [];
+        renderTables();
+        return;
+      }
+
+      const order1Ref = ordersRef.child(table1Id);
+      const order2Ref = ordersRef.child(table2Id);
+      
+      order1Ref.once('value', snap1 => {
+        const data1 = snap1.val() || { items: {}, total: 0 };
+        const items1 = data1.items || {};
+        
+        order2Ref.once('value', snap2 => {
+          const data2 = snap2.val() || { items: {}, total: 0 };
+          const items2 = data2.items || {};
+          
+          const mergedItems = { ...items1 };
+          Object.keys(items2).forEach(key => {
+            mergedItems[key] = (mergedItems[key] || 0) + items2[key];
+          });
+          
+          const total = Object.keys(mergedItems).reduce((sum, key) => {
+            const price = menuItems[key] ? menuItems[key].price : 0;
+            return sum + mergedItems[key] * price;
+          }, 0);
+          
+          order1Ref.update({ items: mergedItems, total: total });
+          order2Ref.remove();
+          tablesRef.child(table2Id).update({ status: 'empty' });
+          tablesRef.child(table1Id).update({ status: 'occupied' });
+          
+          const newName = prompt(`Nhập tên mới cho bàn ghép (${table1.name} + ${table2.name}):`, `${table1.name}+${table2.name}`);
+          if (newName && newName.trim()) {
+            tablesRef.child(table1Id).update({ name: newName.trim() });
+          }
+          
+          showToast(`✅ Đã ghép bàn thành công!`, 'success');
+          selectedMergeTables = [];
+          mergeMode = false;
+          mergeTablesBtn.innerHTML = '<i class="fas fa-merge"></i> Ghép';
+          mergeTablesBtn.style.background = '#2d1f12';
+          renderTables();
+          selectTable(table1Id);
+        });
+      });
+    }
+
+    // ============================================================
+    // CHỨC NĂNG KÉO THẢ (Drag & Drop)
+    // ============================================================
+    let draggedItemId = null;
+
+    // Xử lý drag trên mobile (touch) và desktop (mouse)
+    function setupDragAndDrop() {
+      // Sự kiện cho desktop
+      document.addEventListener('dragstart', (e) => {
+        const item = e.target.closest('.menu-item');
+        if (!item) return;
+        draggedItemId = item.dataset.itemId;
+        item.classList.add('dragging');
+      });
+
+      document.addEventListener('dragend', (e) => {
+        const item = e.target.closest('.menu-item');
+        if (item) item.classList.remove('dragging');
+        dropZone.classList.remove('active');
+      });
+
+      document.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('active');
+      });
+
+      document.addEventListener('dragleave', (e) => {
+        dropZone.classList.remove('active');
+      });
+
+      document.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('active');
+        if (draggedItemId) {
+          handleDropToTable(draggedItemId);
+          draggedItemId = null;
+        }
+      });
+
+      // Sự kiện cho mobile (touch)
+      let touchStartY = 0;
+      let touchItemId = null;
+      
+      document.addEventListener('touchstart', (e) => {
+        const item = e.target.closest('.menu-item');
+        if (!item) return;
+        touchStartY = e.touches[0].clientY;
+        touchItemId = item.dataset.itemId;
+      }, { passive: true });
+
+      document.addEventListener('touchmove', (e) => {
+        if (!touchItemId) return;
+        const touchY = e.touches[0].clientY;
+        const dropRect = dropZone.getBoundingClientRect();
+        
+        // Nếu ngón tay đang ở khu vực drop zone
+        if (touchY >= dropRect.top && touchY <= dropRect.bottom) {
+          dropZone.classList.add('active');
+        } else {
+          dropZone.classList.remove('active');
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchend', (e) => {
+        if (!touchItemId) return;
+        const dropRect = dropZone.getBoundingClientRect();
+        const touchEnd = e.changedTouches[0];
+        
+        if (touchEnd.clientY >= dropRect.top && touchEnd.clientY <= dropRect.bottom) {
+          handleDropToTable(touchItemId);
+        }
+        
+        dropZone.classList.remove('active');
+        touchItemId = null;
+      }, { passive: true });
+    }
+
+    function handleDropToTable(itemId) {
+      if (!currentTableId) {
+        showToast('⚠️ Vui lòng chọn một bàn trước khi kéo thả!', 'error');
+        return;
+      }
+      
+      const table = allTables[currentTableId];
+      if (!table) {
+        showToast('⚠️ Bàn không tồn tại!', 'error');
+        return;
+      }
+      
+      // Nếu bàn trống, tự động mở bàn
+      if (table.status !== 'occupied') {
+        tablesRef.child(currentTableId).update({ status: 'occupied' });
+        ordersRef.child(currentTableId).set({ items: {}, total: 0 });
+      }
+      
+      addItemToTable(currentTableId, itemId);
+      showToast('✅ Đã thêm món từ kéo thả', 'success');
+    }
+
+    // ============================================================
+    // RENDER MENU (với drag & drop)
+    // ============================================================
+    function renderMenu() {
+      let html = '';
+      const ids = Object.keys(menuItems);
+      if (ids.length === 0) {
+        html = '<span style="color:#7f6e5d;font-size:13px;padding:8px 0;display:block;">Chưa có món, vui lòng thêm món mới!</span>';
+      } else {
+        ids.forEach(id => {
+          const item = menuItems[id];
+          html += `
+            <div class="menu-item" data-item-id="${id}" draggable="true">
+              <div class="menu-item-info">
+                <div class="name"><i class="fas fa-grip-lines drag-icon"></i> ${item.name || 'Món'}</div>
+                <div class="price">${(item.price || 0).toLocaleString()}đ</div>
+              </div>
+              <div class="menu-item-actions">
+                <button class="btn-serve" onclick="handleServeItem('${id}')">
+                  <i class="fas fa-plus-circle"></i> Gọi
+                </button>
+                <button class="btn-action-trigger btn-action-edit" onclick="editMenuItem('${id}')" title="Sửa">
+                  <i class="fas fa-pen-to-square"></i>
+                </button>
+                <button class="btn-action-trigger btn-action-del" onclick="deleteMenuItem('${id}')" title="Xóa">
+                  <i class="fas fa-trash-can"></i>
+                </button>
+              </div>
+            </div>`;
+        });
+      }
+      menuItemsList.innerHTML = html;
+    }
+
+    // ============================================================
+    // CHỈNH SỬA VÀ XÓA MÓN
+    // ============================================================
+    window.editMenuItem = function(id) {
+      const item = menuItems[id];
+      if (!item) return;
+      const newName = prompt("Nhập tên đồ uống mới:", item.name);
+      if (newName === null || newName.trim() === "") return;
+      const newPrice = parseInt(prompt("Nhập giá đồ uống mới (đ):", item.price));
+      if (isNaN(newPrice) || newPrice < 0) {
+        showToast("⚠️ Giá tiền không hợp lệ!", "error");
+        return;
+      }
+      menuRef.child(id).update({ name: newName.trim(), price: newPrice })
+        .then(() => showToast("✅ Sửa đồ uống thành công!", "success"));
+    };
+
+    window.deleteMenuItem = function(id) {
+      const item = menuItems[id];
+      if (!item) return;
+      if (confirm(`Bạn có chắc muốn xóa món "${item.name}" khỏi menu thực đơn không?`)) {
+        menuRef.child(id).remove()
+          .then(() => showToast("🗑️ Đã xóa món ăn/đồ uống", "info"));
+      }
+    };
+
+    window.handleServeItem = function(id) {
+      if (!currentTableId) {
+        showToast('⚠️ Vui lòng ấn chọn một Bàn ở phía trên trước!', 'error');
+        return;
+      }
+      const table = allTables[currentTableId];
+      if (!table || table.status !== 'occupied') {
+        tablesRef.child(currentTableId).update({ status: 'occupied' });
+        ordersRef.child(currentTableId).set({ items: {}, total: 0 });
+      }
+      addItemToTable(currentTableId, id);
+      showToast('✅ Đã thêm vào danh sách đơn bàn', 'success');
+    };
+
+    // ============================================================
+    // SELECT TABLE
+    // ============================================================
+    function selectTable(tableId) {
+      if (mergeMode) return;
+      
+      currentTableId = tableId;
+      const table = allTables[tableId];
+      if (!table) return;
+
+      tableDetail.classList.remove('hidden');
+      detailTableName.textContent = table.name || `Bàn ${tableId}`;
+      updateDropZone();
+
+      if (table.status !== 'occupied') {
+        tablesRef.child(tableId).update({ status: 'occupied' });
+        ordersRef.child(tableId).set({ items: {}, total: 0 });
+      }
+
+      if (orderListeners[tableId]) {
+        orderListeners[tableId]();
+        delete orderListeners[tableId];
+      }
+
+      const listener = ordersRef.child(tableId).on('value', snap => {
+        const data = snap.val() || { items: {}, total: 0 };
+        const items = data.items || {};
+        let html = '';
+        let total = 0;
+        const keys = Object.keys(items);
+        if (keys.length === 0) {
+          html = '<p style="color:#7f6e5d;text-align:center;padding:8px 0;">Chưa gọi đồ uống nào</p>';
+        } else {
+          keys.forEach(key => {
+            const qty = items[key] || 0;
+            const menu = menuItems[key];
+            const name = menu ? menu.name : 'Đồ uống (Đã xóa)';
+            const price = menu ? menu.price : 0;
+            const subtotal = qty * price;
+            total += subtotal;
+            html += `
+              <div class="order-item">
+                <span>${name}</span>
+                <div class="item-controls">
+                  <button onclick="updateItemQuantity('${key}', -1)">−</button>
+                  <span class="qty">${qty}</span>
+                  <button onclick="updateItemQuantity('${key}', 1)">+</button>
+                  <button onclick="removeItemFromOrder('${key}')" style="color:#c0392b;background:transparent;width:24px;">✕</button>
+                </div>
+                <span>${subtotal.toLocaleString()}đ</span>
+              </div>
+            `;
+          });
+        }
+        orderDetail.innerHTML = html;
+        detailTotal.innerHTML = `${total.toLocaleString()}<span style="font-size:13px;font-weight:600;color:#7f6e5d;margin-left:2px;">đ</span>`;
+        ordersRef.child(tableId).update({ total });
+      });
+
+      orderListeners[tableId] = () => { ordersRef.child(tableId).off(); };
+      
+      setTimeout(() => {
+        tableDetail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 150);
+    }
+
+    function updateDropZone() {
+      if (currentTableId && allTables[currentTableId]) {
+        dropZone.innerHTML = `
+          <i class="fas fa-arrow-down" style="margin-right:8px;"></i>
+          Kéo món thả vào đây để gọi cho <strong>${allTables[currentTableId].name}</strong>
+        `;
+      } else {
+        dropZone.innerHTML = `
+          <i class="fas fa-arrow-down" style="margin-right:8px;"></i>
+          Kéo món từ menu thả vào đây để gọi món cho bàn đã chọn
+        `;
+      }
+    }
+
+    // ============================================================
+    // CHỨC NĂNG THAY ĐỔI SỐ LƯỢNG MÓN TRONG ORDER
+    // ============================================================
+    window.updateItemQuantity = function(itemId, delta) {
+      if (!currentTableId) return;
+      const orderRef = ordersRef.child(currentTableId).child('items').child(itemId);
+      orderRef.transaction(current => {
+        const newVal = (current || 0) + delta;
+        return newVal > 0 ? newVal : 0;
+      });
+    };
+
+    window.removeItemFromOrder = function(itemId) {
+      if (!currentTableId) return;
+      if (!confirm('Bạn có chắc muốn xóa món này khỏi đơn?')) return;
+      ordersRef.child(currentTableId).child('items').child(itemId).remove();
+      showToast('🗑️ Đã xóa món khỏi đơn', 'info');
+    };
+
+    function addItemToTable(tableId, itemId) {
+      if (!itemId) return;
+      ordersRef.child(tableId).child('items').child(itemId).transaction(current => {
+        return (current || 0) + 1;
+      });
+    }
+
+    // ============================================================
+    // ADD TABLE / MENU ITEM
+    // ============================================================
+    addTableBtn.addEventListener('click', () => {
+      if (!tablesRef) return;
+      const count = Object.keys(allTables).length + 1;
+      const name = prompt('Nhập tên khu vực / tên bàn:', `Bàn ${count}`);
+      if (name === null) return;
+      tablesRef.push({
+        name: name.trim() || `Bàn ${count}`,
+        status: 'empty'
+      });
+      showToast('✅ Đã thêm bàn thành công', 'success');
+    });
+
+    addItemBtn.addEventListener('click', () => {
+      if (!menuRef) return;
+      const name = newItemName.value.trim();
+      const price = parseInt(newItemPrice.value);
+      if (!name || isNaN(price) || price < 0) {
+        showToast('⚠️ Vui lòng nhập thông tin món và giá chính xác!', 'error');
+        return;
+      }
+      menuRef.push({ name, price });
+      newItemName.value = '';
+      newItemPrice.value = '';
+      showToast('✅ Đã thêm vào thực đơn mới', 'success');
+    });
+
+    // ============================================================
+    // CLEAR / CHECKOUT
+    // ============================================================
+    clearTableBtn.addEventListener('click', () => {
+      if (!currentTableId) return;
+      if (!confirm('Bạn muốn hủy toàn bộ thực đơn đã gọi và đưa bàn về trạng thái Trống?')) return;
+      ordersRef.child(currentTableId).remove();
+      tablesRef.child(currentTableId).update({ status: 'empty' });
+      clearDetail();
+      showToast('🔄 Đã làm trống trạng thái bàn', 'info');
+    });
+
+    checkoutBtn.addEventListener('click', () => {
+      if (!currentTableId) return;
+      const table = allTables[currentTableId];
+      if (!table || table.status !== 'occupied') return;
+
+      ordersRef.child(currentTableId).once('value', snap => {
+        const data = snap.val() || {};
+        const total = data.total || 0;
+        if (total === 0) {
+          showToast('⚠️ Bàn chưa chọn đồ uống nào để tính tiền!', 'error');
+          return;
+        }
+
+        const reportRef = db.ref(`${currentUser.uid}/reports`).push();
+        reportRef.set({
+          tableId: currentTableId,
+          tableName: table.name || `Bàn ${currentTableId}`,
+          total: total,
+          items: data.items || {},
+          timestamp: Date.now(),
+          date: new Date().toISOString().split('T')[0]
+        });
+
+        ordersRef.child(currentTableId).remove();
+        tablesRef.child(currentTableId).update({ status: 'empty' });
+        clearDetail();
+        showToast(`✅ Đã thanh toán: ${total.toLocaleString()}đ`, 'success');
+      });
+    });
+
+    // ============================================================
+    // DASHBOARD & REPORTS
+    // ============================================================
+    function updateDashboard() {
+      if (!ordersRef || !currentUser) return;
+      let occupied = 0;
+      Object.values(allTables).forEach(t => { if (t.status === 'occupied') occupied++; });
+      occupiedTables.textContent = occupied;
+      totalTables.textContent = Object.keys(allTables).length;
+
+      const today = new Date().toISOString().split('T')[0];
+      db.ref(`${currentUser.uid}/reports`).orderByChild('date').equalTo(today).once('value', repSnap => {
+        const reps = repSnap.val() || {};
+        let rev = 0;
+        Object.values(reps).forEach(r => rev += (r.total || 0));
+        todayRevenue.innerHTML = `${rev.toLocaleString()}<span class="currency">đ</span>`;
+      });
+
+      db.ref(`${currentUser.uid}/reports`).once('value', repSnap => {
+        const reps = repSnap.val() || {};
+        let total = 0;
+        Object.values(reps).forEach(r => {
+          const items = r.items || {};
+          Object.values(items).forEach(q => total += q);
+        });
+        totalItemsSold.textContent = total;
+      });
+    }
+
+    function loadReport(mode, dateStr) {
+      if (!currentUser) return;
+      const reportRef = db.ref(`${currentUser.uid}/reports`);
+      let query;
+      if (mode === 'day') {
+        query = reportRef.orderByChild('date').equalTo(dateStr);
+      } else if (mode === 'month') {
+        const prefix = dateStr.substring(0, 7);
+        query = reportRef.orderByChild('date').startAt(prefix + '-01').endAt(prefix + '-31');
+      } else if (mode === 'year') {
+        const prefix = dateStr.substring(0, 4);
+        query = reportRef.orderByChild('date').startAt(prefix + '-01-01').endAt(prefix + '-12-31');
+      }
+
+      query.once('value', snap => {
+        const data = snap.val() || {};
+        let revenue = 0, orders = 0, items = 0;
+        const list = [];
+        Object.values(data).forEach(r => {
+          revenue += (r.total || 0);
+          orders++;
+          const its = r.items || {};
+          Object.values(its).forEach(q => items += q);
+          list.push(r);
+        });
+
+        reportRevenue.innerHTML = `${revenue.toLocaleString()}<span style="font-size:11px;font-weight:500;color:#7f6e5d;margin-left:2px;">đ</span>`;
+        reportOrders.textContent = orders;
+        reportItems.textContent = items;
+
+        let detailHtml = list.length ?
+          list.map(r => `<div><span>${r.tableName || 'Bàn'}</span> <span><strong>${r.total.toLocaleString()}đ</strong> <span style="color:#7f6e5d;font-size:11px;">(${r.date})</span></span></div>`).join('') :
+          '<p style="color:#7f6e5d;text-align:center;padding:8px 0;">Không có dữ liệu trong khoảng thời gian này</p>';
+        reportDetailList.innerHTML = detailHtml;
+      });
+    }
+
+    reportDayBtn.addEventListener('click', () => {
+      if (!reportDate.value) return;
+      loadReport('day', reportDate.value);
+      showToast('📊 Đã cập nhật báo cáo Ngày', 'info');
+    });
+    reportMonthBtn.addEventListener('click', () => {
+      if (!reportDate.value) return;
+      loadReport('month', reportDate.value);
+      showToast('📊 Đã cập nhật báo cáo Tháng', 'info');
+    });
+    reportYearBtn.addEventListener('click', () => {
+      if (!reportDate.value) return;
+      loadReport('year', reportDate.value);
+      showToast('📊 Đã cập nhật báo cáo Năm', 'info');
+    });
+
+    // ============================================================
+    // TAB SWITCH & CONTROL HELPERS
+    // ============================================================
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        const target = this.dataset.tab;
+        tabDashboard.classList.add('hidden');
+        tabTables.classList.add('hidden');
+        tabReport.classList.add('hidden');
+        if (target === 'dashboard') tabDashboard.classList.remove('hidden');
+        else if (target === 'tables') tabTables.classList.remove('hidden');
+        else if (target === 'report') tabReport.classList.remove('hidden');
+      });
+    });
+
+    function clearDetail() {
+      tableDetail.classList.add('hidden');
+      if (currentTableId && orderListeners[currentTableId]) {
+        orderListeners[currentTableId]();
+        delete orderListeners[currentTableId];
+      }
+      currentTableId = null;
+      updateDropZone();
+    }
+
+    // ============================================================
+    // KHỞI TẠO DRAG & DROP
+    // ============================================================
+    setupDragAndDrop();
+
+    // Init Date Default
+    reportDate.value = new Date().toISOString().split('T')[0];
+    console.log('☕ CafeManager Pro - Drag & Drop Version Loaded Successfully!');
+  </script>
+</body>
+</html>
