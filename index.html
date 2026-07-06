@@ -433,7 +433,7 @@
       min-height: 38px;
     }
 
-    /* ========== FIXED SCROLLABLE LAYOUT ========== */
+    /* ========== TABLES SECTION ========== */
     .tables-section {
       max-height: 200px;
       overflow-y: auto;
@@ -509,7 +509,22 @@
       cursor: pointer;
     }
 
-    /* ========== MENU MANAGEMENT - FIXED HEIGHT ========== */
+    .table-card .selected-badge {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background: #2e7d5e;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ========== MENU MANAGEMENT ========== */
     .menu-section {
       background: #faf8f6;
       border-radius: 18px;
@@ -534,7 +549,6 @@
     #newItemName { flex: 2; min-width: 100px; }
     #newItemPrice { flex: 1; min-width: 60px; }
 
-    /* Menu items với chiều cao cố định và cuộn */
     .menu-items-container {
       max-height: 180px;
       overflow-y: auto;
@@ -556,33 +570,6 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      cursor: grab;
-      transition: transform 0.1s, box-shadow 0.1s;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .menu-item:active {
-      cursor: grabbing;
-    }
-
-    .menu-item.dragging {
-      opacity: 0.5;
-      transform: scale(0.95);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    .menu-item.drag-over {
-      border-color: #b47c5e;
-      background: #f4ede7;
-      border-width: 2px;
-    }
-
-    .menu-item .drag-icon {
-      color: #ccc;
-      font-size: 16px;
-      margin-right: 4px;
-      cursor: grab;
     }
 
     .menu-item-info {
@@ -608,12 +595,13 @@
       display: flex;
       align-items: center;
       gap: 4px;
+      flex-shrink: 0;
     }
 
     .btn-serve {
-      background: #ede8e2;
-      color: #2d1f12;
-      padding: 8px 12px;
+      background: #2e7d5e;
+      color: white;
+      padding: 8px 14px;
       border-radius: 10px;
       font-size: 12px;
       font-weight: 700;
@@ -624,7 +612,13 @@
       border: none;
       cursor: pointer;
     }
-    .btn-serve:active { background: #dfd8cf; }
+    .btn-serve:active { background: #1f5c45; }
+
+    .btn-serve-sm {
+      padding: 6px 10px;
+      font-size: 11px;
+      min-height: 32px;
+    }
 
     .btn-action-trigger {
       background: transparent;
@@ -845,41 +839,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .rule-box {
-      background: #1e2a3a;
-      color: #e4e9f0;
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 12px;
-      font-size: 11px;
-      font-family: monospace;
-    }
-    .rule-box .comment { color: #6a9955; }
-    .rule-box .key { color: #9cdcfe; }
-    .rule-box .string { color: #ce9178; }
-
-    /* ========== DROP ZONE ========== */
-    .drop-zone {
-      border: 2px dashed #ccc;
-      border-radius: 16px;
-      padding: 12px;
-      text-align: center;
-      color: #999;
-      font-size: 13px;
-      margin: 4px 0 8px 0;
-      transition: all 0.2s;
-      min-height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .drop-zone.active {
-      border-color: #b47c5e;
-      background: #f4ede7;
-      color: #2d1f12;
-    }
-
     /* ========== RESPONSIVE MOBILE SIZES ========== */
     @media (max-width: 420px) {
       .app { padding: 14px 12px; border-radius: 20px; }
@@ -887,6 +846,7 @@
       .stat-card .value { font-size: 17px; }
       .tab { font-size: 11px; }
       .tables-section { max-height: 160px; }
+      .menu-items-container { max-height: 150px; }
     }
     @media (min-width: 600px) {
       .app { max-width: 480px; }
@@ -942,10 +902,6 @@
           <div id="registerError" class="auth-error"></div>
           <div id="registerSuccess" class="auth-success"></div>
         </div>
-
-       <!-- <div class="demo-hint">
-          🧪 Dùng thử: <code>demo@cafe.com</code> / <code>123456</code>
-        </div> -->
       </div>
     </div>
 
@@ -1012,22 +968,16 @@
           </div>
         </div>
 
-        <!-- Bàn với chiều cao cố định và cuộn -->
+        <!-- Bàn -->
         <div class="tables-section" id="tablesSection">
           <div class="table-grid" id="tableGrid"></div>
         </div>
-
-        <!-- Drop Zone để kéo thả món vào bàn -->
-        <div class="drop-zone" id="dropZone">
-          <i class="fas fa-arrow-down" style="margin-right:8px;"></i>
-          Kéo món từ menu thả vào đây để gọi món cho bàn đã chọn 
-        </div> 
 
         <div class="section-header" style="margin-top:4px;">
           <h3><i class="fas fa-mug-hot"></i> Menu thực đơn</h3>
         </div>
 
-        <!-- Menu với chiều cao cố định và cuộn -->
+        <!-- Menu -->
         <div class="menu-section">
           <div class="add-item-row">
             <input type="text" id="newItemName" placeholder="Tên món">
@@ -1098,14 +1048,14 @@
     // FIREBASE CONFIG
     // ============================================================
     const firebaseConfig = {
-  apiKey: "AIzaSyDul0MkkTSn15F-g48DUxr1YJk8xew51p0",
-  authDomain: "qlcoffee-97289.firebaseapp.com",
-  databaseURL: "https://qlcoffee-97289-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "qlcoffee-97289",
-  storageBucket: "qlcoffee-97289.firebasestorage.app",
-  messagingSenderId: "679380881408",
-  appId: "1:679380881408:web:f23223b4108bd2c17d88e5"
-};
+      apiKey: "AIzaSyDul0MkkTSn15F-g48DUxr1YJk8xew51p0",
+      authDomain: "qlcoffee-97289.firebaseapp.com",
+      databaseURL: "https://qlcoffee-97289-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "qlcoffee-97289",
+      storageBucket: "qlcoffee-97289.firebasestorage.app",
+      messagingSenderId: "679380881408",
+      appId: "1:679380881408:web:f23223b4108bd2c17d88e5"
+    };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
@@ -1155,7 +1105,6 @@
     const addItemBtn = $('addItemBtn');
     const newItemName = $('newItemName');
     const newItemPrice = $('newItemPrice');
-    const dropZone = $('dropZone');
 
     const tableDetail = $('tableDetail');
     const detailTableName = $('detailTableName');
@@ -1337,7 +1286,6 @@
         renderTables();
         updateDashboard();
         if (currentTableId && !allTables[currentTableId]) clearDetail();
-        updateDropZone();
       });
 
       menuRef.on('value', snap => {
@@ -1361,7 +1309,9 @@
           const t = allTables[id];
           const isOccupied = (t.status === 'occupied');
           const isSelected = mergeMode && selectedMergeTables.includes(id);
-          html += `<div class="table-card" data-id="${id}" style="${isSelected ? 'border-color:#d68910;border-width:2px;' : ''}">
+          const isCurrent = currentTableId === id;
+          html += `<div class="table-card" data-id="${id}" style="${isSelected ? 'border-color:#d68910;border-width:2px;' : ''}${isCurrent ? 'border-color:#2e7d5e;border-width:2px;' : ''}">
+              ${isCurrent ? '<div class="selected-badge">✓</div>' : ''}
               <div class="table-name">${t.name || 'Bàn'}</div>
               <div class="status ${isOccupied ? 'occupied' : 'empty'}">${isOccupied ? '🟡 Phục vụ' : '⚪ Trống'}</div>
               ${isOccupied ? `<button class="bill-btn" data-id="${id}">🧾 Chi tiết</button>` : ''}
@@ -1492,106 +1442,7 @@
     }
 
     // ============================================================
-    // CHỨC NĂNG KÉO THẢ (Drag & Drop)
-    // ============================================================
-    let draggedItemId = null;
-
-    // Xử lý drag trên mobile (touch) và desktop (mouse)
-    function setupDragAndDrop() {
-      // Sự kiện cho desktop
-      document.addEventListener('dragstart', (e) => {
-        const item = e.target.closest('.menu-item');
-        if (!item) return;
-        draggedItemId = item.dataset.itemId;
-        item.classList.add('dragging');
-      });
-
-      document.addEventListener('dragend', (e) => {
-        const item = e.target.closest('.menu-item');
-        if (item) item.classList.remove('dragging');
-        dropZone.classList.remove('active');
-      });
-
-      document.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('active');
-      });
-
-      document.addEventListener('dragleave', (e) => {
-        dropZone.classList.remove('active');
-      });
-
-      document.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('active');
-        if (draggedItemId) {
-          handleDropToTable(draggedItemId);
-          draggedItemId = null;
-        }
-      });
-
-      // Sự kiện cho mobile (touch)
-      let touchStartY = 0;
-      let touchItemId = null;
-      
-      document.addEventListener('touchstart', (e) => {
-        const item = e.target.closest('.menu-item');
-        if (!item) return;
-        touchStartY = e.touches[0].clientY;
-        touchItemId = item.dataset.itemId;
-      }, { passive: true });
-
-      document.addEventListener('touchmove', (e) => {
-        if (!touchItemId) return;
-        const touchY = e.touches[0].clientY;
-        const dropRect = dropZone.getBoundingClientRect();
-        
-        // Nếu ngón tay đang ở khu vực drop zone
-        if (touchY >= dropRect.top && touchY <= dropRect.bottom) {
-          dropZone.classList.add('active');
-        } else {
-          dropZone.classList.remove('active');
-        }
-      }, { passive: true });
-
-      document.addEventListener('touchend', (e) => {
-        if (!touchItemId) return;
-        const dropRect = dropZone.getBoundingClientRect();
-        const touchEnd = e.changedTouches[0];
-        
-        if (touchEnd.clientY >= dropRect.top && touchEnd.clientY <= dropRect.bottom) {
-          handleDropToTable(touchItemId);
-        }
-        
-        dropZone.classList.remove('active');
-        touchItemId = null;
-      }, { passive: true });
-    }
-
-    function handleDropToTable(itemId) {
-      if (!currentTableId) {
-        showToast('⚠️ Vui lòng chọn một bàn trước khi kéo thả!', 'error');
-        return;
-      }
-      
-      const table = allTables[currentTableId];
-      if (!table) {
-        showToast('⚠️ Bàn không tồn tại!', 'error');
-        return;
-      }
-      
-      // Nếu bàn trống, tự động mở bàn
-      if (table.status !== 'occupied') {
-        tablesRef.child(currentTableId).update({ status: 'occupied' });
-        ordersRef.child(currentTableId).set({ items: {}, total: 0 });
-      }
-      
-      addItemToTable(currentTableId, itemId);
-      showToast('✅ Đã thêm món từ kéo thả', 'success');
-    }
-
-    // ============================================================
-    // RENDER MENU (với drag & drop)
+    // RENDER MENU
     // ============================================================
     function renderMenu() {
       let html = '';
@@ -1602,9 +1453,9 @@
         ids.forEach(id => {
           const item = menuItems[id];
           html += `
-            <div class="menu-item" data-item-id="${id}" draggable="true">
+            <div class="menu-item" data-item-id="${id}">
               <div class="menu-item-info">
-                <div class="name"><i class="fas fa-grip-lines drag-icon"></i> ${item.name || 'Món'}</div>
+                <div class="name">${item.name || 'Món'}</div>
                 <div class="price">${(item.price || 0).toLocaleString()}đ</div>
               </div>
               <div class="menu-item-actions">
@@ -1656,12 +1507,16 @@
         return;
       }
       const table = allTables[currentTableId];
-      if (!table || table.status !== 'occupied') {
+      if (!table) {
+        showToast('⚠️ Bàn không tồn tại!', 'error');
+        return;
+      }
+      if (table.status !== 'occupied') {
         tablesRef.child(currentTableId).update({ status: 'occupied' });
         ordersRef.child(currentTableId).set({ items: {}, total: 0 });
       }
       addItemToTable(currentTableId, id);
-      showToast('✅ Đã thêm vào danh sách đơn bàn', 'success');
+      showToast('✅ Đã thêm món', 'success');
     };
 
     // ============================================================
@@ -1676,7 +1531,7 @@
 
       tableDetail.classList.remove('hidden');
       detailTableName.textContent = table.name || `Bàn ${tableId}`;
-      updateDropZone();
+      renderTables();
 
       if (table.status !== 'occupied') {
         tablesRef.child(tableId).update({ status: 'occupied' });
@@ -1730,22 +1585,8 @@
       }, 150);
     }
 
-    function updateDropZone() {
-      if (currentTableId && allTables[currentTableId]) {
-        dropZone.innerHTML = `
-          <i class="fas fa-arrow-down" style="margin-right:8px;"></i>
-          Kéo món thả vào đây để gọi cho <strong>${allTables[currentTableId].name}</strong>
-        `;
-      } else {
-        dropZone.innerHTML = `
-          <i class="fas fa-arrow-down" style="margin-right:8px;"></i>
-          Kéo món từ menu thả vào đây để gọi món cho bàn đã chọn
-        `;
-      }
-    }
-
     // ============================================================
-    // CHỨC NĂNG THAY ĐỔI SỐ LƯỢNG MÓN TRONG ORDER
+    // CHỨC NĂNG THAY ĐỔI SỐ LƯỢNG MÓN
     // ============================================================
     window.updateItemQuantity = function(itemId, delta) {
       if (!currentTableId) return;
@@ -1947,17 +1788,12 @@
         delete orderListeners[currentTableId];
       }
       currentTableId = null;
-      updateDropZone();
+      renderTables();
     }
-
-    // ============================================================
-    // KHỞI TẠO DRAG & DROP
-    // ============================================================
-    setupDragAndDrop();
 
     // Init Date Default
     reportDate.value = new Date().toISOString().split('T')[0];
-    console.log('☕ CafeManager Pro - Drag & Drop Version Loaded Successfully!');
+    console.log('☕ CafeManager Pro - Mobile Optimized!');
   </script>
 </body>
 </html>
