@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Ghi nhận quyền góp</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f0f2f5;
+            font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 16px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            max-width: 420px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            padding: 20px 18px 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0b1b32;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #1e2c41;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .field-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0b1b32;
+            padding: 8px 0;
+            border-bottom: 1.5px solid #e9edf4;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-value input {
+            width: 100%;
+            border: none;
+            padding: 6px 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #0b1b32;
+            background: transparent;
+            outline: none;
+        }
+
+        .field-value input::placeholder {
+            color: #b0bccd;
+            font-weight: 400;
+        }
+
+        .field-value input[type="date"] {
+            color: #0b1b32;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #1e2c41;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .item-list {
+            margin-bottom: 6px;
+        }
+
+        .item-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .item-row input,
+        .item-row select {
+            border: none;
+            padding: 8px 4px;
+            font-size: 0.9rem;
+            background: transparent;
+            outline: none;
+            color: #0b1b32;
+            width: 100%;
+        }
+
+        .item-row input::placeholder {
+            color: #b0bccd;
+        }
+
+        .item-row select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b7a8f' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+            padding-right: 20px;
+        }
+
+        .item-row .flex-2 {
+            flex: 2;
+        }
+
+        .item-row .flex-1 {
+            flex: 1;
+        }
+
+        .item-row .btn-del {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            color: #b33a34;
+            font-size: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: 0.1s;
+        }
+
+        .item-row .btn-del:active {
+            background: #fce8e6;
+        }
+
+        .btn-add {
+            background: transparent;
+            border: none;
+            color: #2a7de1;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            touch-action: manipulation;
+        }
+
+        .btn-add:active {
+            opacity: 0.6;
+        }
+
+        .btn-add span {
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 2px solid #f0f2f5;
+        }
+
+        .actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.1s;
+            touch-action: manipulation;
+        }
+
+        .actions button:active {
+            transform: scale(0.97);
+        }
+
+        .btn-cancel {
+            background: #f0f2f5;
+            color: #1e2c41;
+        }
+
+        .btn-cancel:active {
+            background: #e0e4ea;
+        }
+
+        .btn-save {
+            background: #0b1b32;
+            color: white;
+            box-shadow: 0 2px 8px rgba(11, 27, 50, 0.12);
+        }
+
+        .btn-save:active {
+            background: #1e3557;
+        }
+
+        .btn-save:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .toast {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-align: center;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            background: #e6f7e6;
+            color: #0f5c3a;
+        }
+
+        .toast.error {
+            background: #fce8e6;
+            color: #b33a34;
+        }
+
+        .toast.loading {
+            background: #eef2f7;
+            color: #1e2c41;
+        }
+
+        .hint {
+            font-size: 0.65rem;
+            color: #b0bccd;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 380px) {
+            .container {
+                padding: 14px 12px;
+            }
+            .item-row input,
+            .item-row select {
+                font-size: 0.85rem;
+                padding: 6px 2px;
+            }
+            .actions button {
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title"># Thêm ghi nhận quyền góp mới</div>
+
+        <div class="field">
+            <span class="field-label">NGÀY NHẬP (DD/MM/YYYY)</span>
+            <div class="field-value">
+                <input type="date" id="ngayNhap">
+            </div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">SỐ SUẤT CƠM PHÁT RA</span>
+            <div class="field-value">
+                <input type="number" id="soSuatCom" value="0" min="0" step="1">
+            </div>
+        </div>
+
+        <div class="section">
+            <span class="section-title">- DANH SÁCH NHÀ HÀO TÂM / ĐƠN VỊ</span>
+            <div class="item-list" id="donViContainer"></div>
+            <button class="btn-add" id="btnThemDonVi" type="button">
+                <span>+</span> Thêm đơn vị
+            </button>
+        </div>
+
+        <div class="section">
+            <span class="section-title">- DANH SÁCH NHU YẾU PHẨM NHẬN</span>
+            <div class="item-list" id="nypContainer"></div>
+            <button class="btn-add" id="btnThemNYP" type="button">
+                <span>+</span> Thêm nhu yếu phẩm
+            </button>
+            <div class="hint">Mặt hàng (VD: Gạo, Dầu ăn...)</div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-cancel" id="btnHuy">Hủy Bỏ</button>
+            <button class="btn-save" id="btnSubmit">Lưu Thông Tin</button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script>
+        // ====== FIREBASE ======
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSQx1ArbmGC1LHanlIr_MTnlv7z_c3Cb0",
+            authDomain: "comtutam-50a7d.firebaseapp.com",
+            databaseURL: "https://comtutam-50a7d-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "comtutam-50a7d",
+            storageBucket: "comtutam-50a7d.firebasestorage.app",
+            messagingSenderId: "964344707891",
+            appId: "1:964344707891:web:f7d592652ffe43b7c69c46"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ====== DOM ======
+        const $ = id => document.getElementById(id);
+        const donViContainer = $('donViContainer');
+        const nypContainer = $('nypContainer');
+        const btnThemDonVi = $('btnThemDonVi');
+        const btnThemNYP = $('btnThemNYP');
+        const btnSubmit = $('btnSubmit');
+        const btnHuy = $('btnHuy');
+        const toast = $('toast');
+        const ngayNhap = $('ngayNhap');
+        const soSuatCom = $('soSuatCom');
+
+        // ====== State ======
+        let donVi = [];
+        let nyp = [];
+        let dvId = 0,
+            nypId = 0;
+        const LOAI = ['Gạo', 'Dầu ăn', 'Đường', 'Nước tương', 'Mì tôm', 'Nước mắm', 'Sữa', 'Trứng', 'Rau củ', 'Chao'];
+
+        // ====== Toast ======
+        function toastMsg(msg, type = 'success') {
+            toast.textContent = msg;
+            toast.className = 'toast show ' + type;
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ====== Format tiền ======
+        function fmt(v) { return Number(v || 0).toLocaleString('vi-VN'); }
+
+        function parseNum(v) { return parseInt(String(v).replace(/[^0-9]/g, '')) || 0; }
+
+        // ====== Render đơn vị ======
+        function renderDV() {
+            if (!donVi.length) { addDV('', 0); return; }
+            let html = '';
+            donVi.forEach(it => {
+                html += `
+                    <div class="item-row">
+                        <div class="flex-2">
+                            <input class="dv-ten" data-id="${it.id}" value="${it.ten||''}" placeholder="Tên đơn vị / nhà hảo tâm">
+                        </div>
+                        <div class="flex-1">
+                            <input class="dv-tien" data-id="${it.id}" value="${fmt(it.soTien)}" placeholder="Số tiền" inputmode="numeric">
+                        </div>
+                        <button class="btn-del" data-id="${it.id}">✕</button>
+                    </div>
+                `;
+            });
+            donViContainer.innerHTML = html;
+
+            document.querySelectorAll('.dv-ten').forEach(el => {
+                el.oninput = function() {
+                    const it = donVi.find(x => x.id === parseInt(this.dataset.id));
+                    if (it) it.ten = this.value;
+                };
+            });
+
+            document.querySelectorAll('.dv-tien').forEach(el => {
+                el.oninput = function() {
+                    const it = donVi.find(x => x.id === parseInt(this.dataset.id));
+                    if (!it) return;
+                    const v = parseNum(this.value);
+                    it.soTien = v;
+                    this.value = fmt(v);
+                };
+                el.onfocus = function() { this.select(); };
+            });
+
+            document.querySelectorAll('.item-row .btn-del').forEach(el => {
+                el.onclick = function() {
+                    const id = parseInt(this.dataset.id);
+                    if (donVi.length <= 1) { toastMsg('Cần ít nhất 1 đơn vị', 'error'); return; }
+                    donVi = donVi.filter(x => x.id !== id);
+                    renderDV();
+                };
+            });
+        }
+
+        function addDV(ten = '', soTien = 0) {
+            donVi.push({ id: ++dvId, ten, soTien });
+            renderDV();
+            setTimeout(() => {
+                const inputs = donViContainer.querySelectorAll('.dv-ten');
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            }, 50);
+        }
+
+        // ====== Render NYP ======
+        function renderNYP() {
+            if (!nyp.length) { addNYP('', 0); return; }
+            let html = '';
+            nyp.forEach(it => {
+                html += `
+                    <div class="item-row">
+                        <div class="flex-2">
+                            <select class="nyp-loai" data-id="${it.id}">
+                                <option value="">Mặt hàng...</option>
+                                ${LOAI.map(l => `<option value="${l}" ${l===it.loai?'selected':''}>${l}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <input class="nyp-sl" data-id="${it.id}" type="number" value="${it.soLuong||''}" placeholder="SL" min="0" step="0.5">
+                        </div>
+                        <button class="btn-del" data-id="${it.id}">✕</button>
+                    </div>
+                `;
+            });
+            nypContainer.innerHTML = html;
+
+            document.querySelectorAll('.nyp-loai').forEach(el => {
+                el.onchange = function() {
+                    const it = nyp.find(x => x.id === parseInt(this.dataset.id));
+                    if (it) it.loai = this.value;
+                };
+            });
+
+            document.querySelectorAll('.nyp-sl').forEach(el => {
+                el.oninput = function() {
+                    const it = nyp.find(x => x.id === parseInt(this.dataset.id));
+                    if (it) it.soLuong = parseFloat(this.value) || 0;
+                };
+            });
+
+            document.querySelectorAll('.item-row .btn-del').forEach(el => {
+                el.onclick = function() {
+                    const id = parseInt(this.dataset.id);
+                    if (nyp.length <= 1) { toastMsg('Cần ít nhất 1 loại', 'error'); return; }
+                    nyp = nyp.filter(x => x.id !== id);
+                    renderNYP();
+                };
+            });
+        }
+
+        function addNYP(loai = '', soLuong = 0) {
+            nyp.push({ id: ++nypId, loai, soLuong });
+            renderNYP();
+            setTimeout(() => {
+                const inputs = nypContainer.querySelectorAll('.nyp-sl');
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            }, 50);
+        }
+
+        // ====== Get data ======
+        function getData() {
+            return {
+                ngayNhap: ngayNhap.value || '',
+                soSuatCom: parseInt(soSuatCom.value) || 0,
+                donVi: donVi.map(x => ({ ten: x.ten || '', soTien: x.soTien || 0 })),
+                nhuYeuPham: nyp.map(x => ({ loai: x.loai || '', soLuong: x.soLuong || 0 })),
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+        }
+
+        // ====== Save ======
+        function save() {
+            const data = getData();
+            btnSubmit.disabled = true;
+            toastMsg('Đang lưu...', 'loading');
+
+            // Lưu vào node "nhuYeuPham" (khớp với Rules)
+            db.ref('nhuYeuPham').push(data)
+                .then(() => {
+                    toastMsg('✅ Đã lưu thành công!', 'success');
+                    resetForm();
+                })
+                .catch(e => {
+                    console.error('Lỗi chi tiết:', e);
+                    toastMsg('❌ Lỗi: ' + e.message, 'error');
+                })
+                .finally(() => {
+                    btnSubmit.disabled = false;
+                });
+        }
+
+        // ====== Reset ======
+        function resetForm() {
+            ngayNhap.value = new Date().toISOString().split('T')[0];
+            soSuatCom.value = '0';
+            donVi = [];
+            nyp = [];
+            dvId = 0;
+            nypId = 0;
+            addDV('', 0);
+            addNYP('', 0);
+        }
+
+        // ====== Cancel ======
+        function cancel() {
+            if (confirm('Hủy bỏ? Dữ liệu chưa lưu sẽ mất.')) resetForm();
+        }
+
+        // ====== Init ======
+        function init() {
+            ngayNhap.value = new Date().toISOString().split('T')[0];
+            addDV('', 0);
+            addNYP('', 0);
+
+            btnThemDonVi.onclick = () => addDV('', 0);
+            btnThemNYP.onclick = () => addNYP('', 0);
+            btnSubmit.onclick = save;
+            btnHuy.onclick = cancel;
+        }
+
+        init();
+    </script>
+</body>
+</html>
