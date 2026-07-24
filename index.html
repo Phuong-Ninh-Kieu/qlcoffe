@@ -299,7 +299,7 @@
         <div class="field">
             <span class="field-label">SỐ SUẤT CƠM PHÁT RA</span>
             <div class="field-value">
-                <input type="number" id="soSuatCom" value="0" min="0" step="1">
+                <input type="number" id="phatCom" value="0" min="0" step="1">
             </div>
         </div>
 
@@ -353,7 +353,7 @@
         const btnHuy = $('btnHuy');
         const toast = $('toast');
         const ngayNhap = $('ngayNhap');
-        const soSuatCom = $('soSuatCom');
+        const phatCom = $('phatCom');
 
         // ====== State ======
         let donVi = [];
@@ -490,7 +490,7 @@
         function getData() {
             return {
                 ngayNhap: ngayNhap.value || '',
-                soSuatCom: parseInt(soSuatCom.value) || 0,
+                phatCom: parseInt(phatCom.value) || 0,
                 donVi: donVi.map(x => ({ ten: x.ten || '', soTien: x.soTien || 0 })),
                 nhuYeuPham: nyp.map(x => ({ loai: x.loai || '', soLuong: x.soLuong || 0 })),
                 timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -521,7 +521,7 @@
         // ====== Reset ======
         function resetForm() {
             ngayNhap.value = new Date().toISOString().split('T')[0];
-            soSuatCom.value = '0';
+            phatCom.value = '0';
             donVi = [];
             nyp = [];
             dvId = 0;
